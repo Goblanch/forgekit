@@ -24,3 +24,15 @@ Formato por entrada: fecha, decisión, alternativas consideradas, por qué se de
 **Decisión:** cualquier asset bajo convención de carpeta `Resources/` o `Addressables/` queda excluido por defecto del chequeo de "no usado".
 
 **Por qué:** estos assets se cargan directamente por string en runtime (`Resources.Load("ruta"))`, no por referencia serializada, así que no aparecen en el grafo de GUIDs y darían falsos positivos sistemáticos. Documentado como limitación conocida en vez de intentar resolverlo en v1, ya que requeriría analizar código C#, no solo YAML).
+
+---
+
+## 2026-09-20 - Fixtures de tests generados por IA, no exportados de Unity
+
+**Decisión:** los fixtures de `.unity`/`.prefab`/`.mat`/`.meta` en `tests/ForgeKit.Core.Tests/Fixtures/SampleUnityProject` están generados por IA reproduciendo la sintaxis real de Unity (YAML multi-documento, tags `!U!N &fileID`), en vez de exportrados desde el Editor de un proyecto real. Por el momento se usan estos Fixtures para testear. Más adelante, se obtendrán de un proyecto real.
+
+**Por qué:** no había un proyecto de Unity disponible en el momento de escribir los tests. Los GUIDs se generaron programáticamente (por la IA) para garantizar 32 caracteres exáctamente.
+
+**Riesgo aceptado y mitigación futura:** como el parser trabaja por regex sobre el patrón `guid: <hex32>`, estos fixtures son representativos para validar esa lógica de extracción sin depender de la semántica completa de Unity. En el futuro se dispondrá de un proyecto real de Unity y se sustituitrán los fixtures actuales.
+
+**Escenario cubierto:** cadena de alcanzabilidad completa (Scene -> PrefabVariant -> PrefabBase -> Material -> Texture) vía `EditorBuildSettings.asset`, un asset verdaderamente huérfano (`OrphanDebugMarker.prefab`), una textura sin optimizar (4096px, sin comprimir) y una optimizada (128px, comprimida) como control negativo, y un duplicado por contenido binario ídéntico con distinto GUID.
