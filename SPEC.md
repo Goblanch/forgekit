@@ -44,18 +44,18 @@ forgekit assetaudit --project <ruta> [opciones]
 | --- | --- | --- | --- |
 | `--project <ruta>` | Sí | string (ruta) | Ruta a la raíz del proyecto Unity (la carpeta que contiene `Assets/` y `ProjectSettings/`). |
 | `--output <ruta>` | No | string (ruta) | Ruta del archivo de reporte a generar. Si se omite, solo se imprime por consola. |
-| `--format <formato>` | No | `console` \| `json` \| `markdown` | Formato de salida. Por defecto `console`. Si se especifica `--output` sin `--format`, se infiere del extensión del archivo. |
+| `--format <formato>` | No | `console` \| `json` \| `markdown` | Formato de salida. Por defecto `console`. Si se especifica `--output` sin `--format`, se infiere de la extensión del archivo. |
 | `--max-texture-size <px>` | No | int | Umbral de tamaño máximo de textura antes de flagear como "sin optimizar". Por defecto `2048`. |
 | `--exclude <patrón>` | No (repetible) | string (glob) | Rutas adicionales a excluir del análisis, además de las exclusiones por defecto (§5.4). Se puede pasar varias veces. |
-| `--severity-threshold <nivel>` | No | `info` \| `warning` \| `error` | Solo reporta hallazgos igual o por encima de este nivel. Por defecto `info` (todo). |
-| `--fail-on <nivel>` | No | `warning` \| `error` | Si se especifica, el proceso retorna código de salida distinto de 0 cuando existe al menos un hallazgo igual o por encima de ese nivel. Pensado para uso en CI. |
+| `--severity-threshold <nivel>` | No | `Info` \| `Warning` \| `Error` | Solo reporta hallazgos igual o por encima de este nivel. Por defecto `Info` (todo). |
+| `--fail-on <nivel>` | No | `Warning` \| `Error` | Si se especifica, el proceso retorna código de salida distinto de 0 cuando existe al menos un hallazgo igual o por encima de ese nivel. Pensado para uso en CI. |
 | `--verbose` | No | flag | Imprime progreso detallado del análisis (útil para debug, no para el reporte final). |
 
 ### 2.3 Códigos de salida
 
 | Código | Significado |
 | --- | --- |
-| `0` | Análisis completado sin errores de ejecución. Puede haber hallazgos si no se suó `--fail-on`. |
+| `0` | Análisis completado sin errores de ejecución. Puede haber hallazgos si no se usó `--fail-on`. |
 | `1` | Análisis completado, pero hay hallazgos que igualan o superan el nivel de `--fail-on`. |
 | `2` | Error de uso: ruta de proyecto inválida, argumentos incorrectos. |
 | `3` | Error de ejecución: fallo de parseo irrecuperable en algún archivo del proyecto. |
@@ -87,7 +87,7 @@ YAML multi-documento (separdo por `--- !u!<classID> &<fileID>`). Cada referencia
 m_Material: {fileID: 2100000, guid: 8b2f1c4a9d3e4f5b8a1c2d3e4f5a6b7c, type: 2}
 ```
 
-El campo relevante para el grafo de referencias es guid. Un mismo archivo puede contener múltiples referencias a múltiples GUIDs distintos.
+El campo relevante para el grafo de referencias es `guid`. Un mismo archivo puede contener múltiples referencias a múltiples GUIDs distintos.
 
 ### 3.3 Formato de archivos `.meta`
 
@@ -129,7 +129,7 @@ Contiene la lista de escenas incluidas en la build activa, cada una como ruta + 
 
 ### 5.1 Construcción del grafo de referencias
 
-1. Anumerar todos los archivos bajo `Assets/` con extensión `.unity`, `.prefab`, `.asset`, `.mat`, `.controller` (los formatos YAML de Unity).
+1. Enumerar todos los archivos bajo `Assets/` con extensión `.unity`, `.prefab`, `.asset`, `.mat`, `.controller` (los formatos YAML de Unity).
 2. Para cada uno, parsear como YAML (multi-documento donde aplique) y extraer, vía regex o parser YAML tolerante a los tags custom de unity (`!u!...`), todas las apariciones de `guid: <hash>`.
 3. El GUID del propio archivo (extraído de su `.meta` correspondiente) es el nodo origen; cada `guid` encontrado en su contenido es una arista saliente.
 4. Resultado: grafo dirigido `Dictionary<Guid, List<Guid>>`
