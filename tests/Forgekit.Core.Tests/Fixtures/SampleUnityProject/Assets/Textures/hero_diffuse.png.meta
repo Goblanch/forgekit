@@ -1,0 +1,28 @@
+fileFormatVersion: 2
+guid: 1fb81bbffba5e53a9da84b90221a129d
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 12
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+  textureType: 0
+  textureShape: 1
+  maxTextureSize: 4096
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 4096
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    overridden: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites: []
+  userData:
+  assetBundleName:
+  assetBundleVariant:

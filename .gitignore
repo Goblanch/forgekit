@@ -427,3 +427,6 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Test Fixture exception
+!tests/Forgekit.Core.Tests/Fixtures/**/*.meta
