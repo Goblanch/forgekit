@@ -10,11 +10,11 @@ En cualquier proyecto de Unity que crece más allá de un prototipo, el árbol d
 
 * **Assets huérfanos:** texturas, prefabs, materiales o ScriptableObjects que ya no referencia nada en el proyecto, pero que siguen ahí, inflando el repositorio y el tamaño de la build.
 * **Texturas mal configuradas:** imágenes sin comprimir o con un tamaño máximo de importación absurdamente alto para su uso real (un icono de 32px importado a 4096px por ejemplo).
-* **Duplicados:** el mismo archivo importado dos veces en rutas distintas, normalmente por copia-pegar entre carpetas o por fusiones de ramas mal resueltas.
+* **Duplicados:** el mismo archivo importado dos veces en rutas distintas, normalmente por copia-pega entre carpetas o por fusiones de ramas mal resueltas.
 
 Esto no es un problema técnico: cuantos más assets tiene un proyecto, más cuesta detectarlo a ojo, y casi ningún estudio pequeño tiene tiempo de mantener esta comprobación a mano. Los estudios grandes suelen automatizarlo en CI, en el resto, simplemente no se hace.
 
-`forgekit assetaudit` resuelve esto: analiza el proyecto sin necesidad de abrir el Editor de Unity, y genera un reporte de hallazgos.
+`forgekit assetaudit` resuelve esto: analiza el proyecto sin necesidad de abrir el Editor de Unity y genera un reporte de hallazgos.
 
 ---
 
@@ -44,7 +44,7 @@ Hash de contenido (no de nombre de archivo) sobre cada asset para detectar el ms
 
 ### 6. Reporte
 
-Salida en tabla por consola, con exportación opcional a JSON o Markdown, y un nivel de severidad (info / warning / error) por cada hallazgo.
+Salida en tabla por consola, con exportación opcional a JSON o Markdown, y un nivel de severidad (Info / Warning / Error) por cada hallazgo.
 
 ---
 
