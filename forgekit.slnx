@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Forgekit.Cli/Forgekit.Cli.csproj" />
+    <Project Path="src/Forgekit.Core/Forgekit.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Forgekit.Core.Tests/Forgekit.Core.Tests.csproj" />
+  </Folder>
+</Solution>
