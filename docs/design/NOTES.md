@@ -43,4 +43,14 @@ Formato por entrada: fecha, decisión, alternativas consideradas, por qué se de
 
 **Por qué:** los `.meta` son YAML de un único documento y estructura relativamente estable -> tiene sentido tipar. Los `.unity`/`.prefab` son multi-documento con tags custom (`!u!114 &...`) que no son YAML estándar y romperían un deserializador tipado sin trabajo adicional significativo - el regex es más simple y hace exactamente lo que el dominio necesita (extraer GUIDs referenciados), sin intentar modelar la semántica completa del formato de escena de Unity.
 
-**Edge case documentado - referencias "colgantes" a recursos built-in de Unity:** `HeroMaterial.mat` referencia un shader con `guid: 0000000000000000f000000000000000`, el GUID real que usa Unity para sus recursos internos (shaders por defecto, etc.), que no vive en `Assets/` ni tiene `.meta` en el proyecto. El regex lo captura igual que cualquier otro GUID; al construir el grafo de referencias, este GUID simplemente no coincidirá con ningún `AssetRecord` conocido. No es un bug - es una referencia legítima a algo fuera del proyecto, y el grafo debe tolerarla sin fallar (no lanzar excepción por un GUID "no encontrado" al resolver referencias).
+**Edge case documentado - Referencias "colgantes" a recursos built-in de Unity:** `HeroMaterial.mat` referencia un shader con `guid: 0000000000000000f000000000000000`, el GUID real que usa Unity para sus recursos internos (shaders por defecto, etc.), que no vive en `Assets/` ni tiene `.meta` en el proyecto. El regex lo captura igual que cualquier otro GUID; al construir el grafo de referencias, este GUID simplemente no coincidirá con ningún `AssetRecord` conocido. No es un bug - es una referencia legítima a algo fuera del proyecto, y el grafo debe tolerarla sin fallar (no lanzar excepción por un GUID "no encontrado" al resolver referencias).
+
+---
+
+## 2026-10-08 - Grafo de referencias y alcanzabilidad
+
+**Decisión**: `AsssetScanner` ignora assets sin `.meta` (sin GUID no se pueden situar en el grafo). `ReferenceGraph.ReachableFrom` hace BFS desde las escenas con `enabled: 1` en `EditorBuildSettings.asset`, e incluye las propias raíces en el resultado. Las referencias a GUIDs sin `AssetRecords` (recursos built-in de Unity) se añaden al grafo igualmente y no provocan error.
+
+**Por qué**: un asset sin `.meta` es un problema distinto (merge mal resuelto, ver SPEC 8.4) y no debe contaminar el análisis de huérfanos. Tolerar GUIDs desconocidos evita falsos errores con shaders y materiales por defecto.
+
+**Nota de fixtures**: `icon_compressed.png` e `icon_compressed_old.png` aparecen como huérfanos junto a `OrphanDebugMarker.prefab` porque nada los referencia; el test lo refleja de forma explícita.
