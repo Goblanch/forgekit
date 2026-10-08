@@ -54,3 +54,15 @@ Formato por entrada: fecha, decisión, alternativas consideradas, por qué se de
 **Por qué**: un asset sin `.meta` es un problema distinto (merge mal resuelto, ver SPEC 8.4) y no debe contaminar el análisis de huérfanos. Tolerar GUIDs desconocidos evita falsos errores con shaders y materiales por defecto.
 
 **Nota de fixtures**: `icon_compressed.png` e `icon_compressed_old.png` aparecen como huérfanos junto a `OrphanDebugMarker.prefab` porque nada los referencia; el test lo refleja de forma explícita.
+
+## 2026-10-08 - Capa de reglas: IAuditRule + AuditContext
+
+**Decisión**: cada regla del SPEC 5 es una clase que implementa `IAuditRule` y recibe un `AuditContext` ya procesado (assets, alcanzables, texturas, opciones). `AssetAuditor` orquesta scan -> grafo -> reglas -> informe y ordena los hallazgos de forma determinista (severidad desc, categoría, ruta ordinal).
+
+**Por qué**: las reglas no tocan disco, así que se testean con contextos construidos a mano (SPEC 7), y añadir una regla nueva no obliga a modificar las existentes. `Forgekit.Cli` solo tendrá que construir `AuditOptions` y llamar a `AssetAuditor.Run`.
+
+**Matices respecto al SPEC**:
+
+- `DuplicateRule` ignora archivos de 0 bytes (todos comparten hash y darían un falso duplicado).
+- Las exclusiones por defecto son fragmentos de ruta (`/Resources/`, `/Addressables/`); el soporte de globs para `--exclude` llega con el CLI.
+- Los `.meta` de texturas se parsean dos veces (scanner y `TextureImportReader`); aceptado en v1 por simplicidad.
