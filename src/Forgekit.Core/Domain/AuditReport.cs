@@ -11,4 +11,6 @@ public sealed class AuditReport
         Findings
             .GroupBy(f => f.Severity)
             .ToDictionary(g => g.Key, g => g.Count());
+
+    public int CountOf(Severity severity) => Findings.Count(f => f.Severity == severity);
 }
