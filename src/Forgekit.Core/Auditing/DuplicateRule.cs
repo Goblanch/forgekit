@@ -2,7 +2,7 @@ using Forgekit.Core.Domain;
 
 namespace Forgekit.Core.Auditing;
 
-public sealed class DiplicateRule : IAuditRule
+public sealed class DuplicateRule : IAuditRule
 {
     public IEnumerable<Finding> Evaluate(AuditContext context)
     {

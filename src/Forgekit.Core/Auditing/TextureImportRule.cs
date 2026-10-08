@@ -2,7 +2,7 @@ using Forgekit.Core.Domain;
 
 namespace Forgekit.Core.Auditing;
 
-public sealed class TextureImpoortRule : IAuditRule
+public sealed class TextureImportRule : IAuditRule
 {
     public IEnumerable<Finding> Evaluate(AuditContext context)
     {
