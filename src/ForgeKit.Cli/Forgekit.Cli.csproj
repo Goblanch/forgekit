@@ -4,11 +4,21 @@
     <ProjectReference Include="..\Forgekit.Core\Forgekit.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Spectre.Console" Version="0.57.2" />
+    <PackageReference Include="System.CommandLine" Version="2.0.12" />
+  </ItemGroup>
+
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>forgekit</ToolCommandName>
+    <PackageId>Forgekit</PackageId>
+    <Version>0.1.0</Version>
   </PropertyGroup>
 
 </Project>
