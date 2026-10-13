@@ -66,3 +66,15 @@ Formato por entrada: fecha, decisión, alternativas consideradas, por qué se de
 - `DuplicateRule` ignora archivos de 0 bytes (todos comparten hash y darían un falso duplicado).
 - Las exclusiones por defecto son fragmentos de ruta (`/Resources/`, `/Addressables/`); el soporte de globs para `--exclude` llega con el CLI.
 - Los `.meta` de texturas se parsean dos veces (scanner y `TextureImportReader`); aceptado en v1 por simplicidad.
+
+---
+
+## 2026-10-13
+
+**Decisión**: `JsonReportFormatter` serializa DTOs privados, no el dominio, con `System.Text.Json` (camelCase, enums como texto, `UnsafeRelaxedJsonEscaping`). `MarkdownReportFormatter` agrupa por severidad desc + categoría, escapa `|` y usa solo `\n`. `AuditReport.CountOf(severity)` sustituye a `SummaryBySeverity` para los resúmenes, porque este omite las severidades con cero hallazgos.
+
+**Por qué**: el JSON es un contrato para consumidores en CI; desacoplarlo del dominio evita cambios accidentales. El escape relajado mantiene legibles el `+` del timestamp y los caracteres no ASCII; no hay riesgo porque la salida no se incrusta en HTML. Los saltos `\n` fijos hacen el informe idéntico en cualquier SO.
+
+**Política de dependencias**: `Forgekit.Core` se mantiene sin librerías de UI/consola (solo YamlDotNet para `.meta`). Cualquier dependencia de presentación irá en `Forgekit.Cli`.
+
+**Deuda anotada**: `MarkdownReportFormatter` trata `DuplicateAsset` como caso especial para listar rutas; si aparecen más, añadir `RelatedPaths` a `Finding`.
