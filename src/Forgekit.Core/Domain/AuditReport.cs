@@ -13,4 +13,12 @@ public sealed class AuditReport
             .ToDictionary(g => g.Key, g => g.Count());
 
     public int CountOf(Severity severity) => Findings.Count(f => f.Severity == severity);
+
+    public AuditReport WithMinimumSeverity(Severity minimum) => new()
+    {
+        ProjectPath = ProjectPath,
+        Timestamp = Timestamp,
+        TotalAssetsScanned = TotalAssetsScanned,
+        Findings = Findings.Where(f => f.Severity >= minimum).ToList()
+    };
 }

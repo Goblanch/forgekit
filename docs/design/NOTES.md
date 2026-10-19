@@ -78,3 +78,18 @@ Formato por entrada: fecha, decisión, alternativas consideradas, por qué se de
 **Política de dependencias**: `Forgekit.Core` se mantiene sin librerías de UI/consola (solo YamlDotNet para `.meta`). Cualquier dependencia de presentación irá en `Forgekit.Cli`.
 
 **Deuda anotada**: `MarkdownReportFormatter` trata `DuplicateAsset` como caso especial para listar rutas; si aparecen más, añadir `RelatedPaths` a `Finding`.
+
+---
+
+## 2026-10-19 — CLI: capas finas, Spectre.Console en el borde, códigos de salida
+
+**Decisión**: `Program.cs` → `AssetAuditCommand` (opciones de `System.CommandLine`) → `AssetAuditRunner` (validación, ejecución, emisión, código de salida). El runner recibe `IAnsiConsole` y dos `TextWriter`, sin depender de `System.CommandLine`. Spectre.Console solo existe en `Forgekit.Cli`; `Core` sigue sin librerías de presentación. Los errores de parseo se gestionan a mano para devolver 2 (el valor por defecto de `System.CommandLine` es 1, que en el SPEC §2.3 significa "hallazgos ≥ `--fail-on`").
+
+**Matices respecto al SPEC**:
+
+- `--exclude` acepta un fragmento de ruta (p. ej. `Assets/ThirdParty/`), no un glob. Evita una dependencia más (`Microsoft.Extensions.FileSystemGlobbing`) en v1.
+- `--verbose` no se implementa todavía: requeriría notificación de progreso desde `Core`. No se acepta la opción para no prometer algo que no hace.
+- `--fail-on` evalúa el informe completo, sin aplicar `--severity-threshold` (el filtro es solo de visualización).
+- El texto de la consola está en inglés; el ejemplo del SPEC §6.1 estaba en español y debe actualizarse.
+- `--format json|markdown` sin `--output` escribe a stdout; `--format console` con `--output` es un error de uso.
+- El proyecto se empaqueta como `dotnet tool` (`PackAsTool`, comando `forgekit`).
