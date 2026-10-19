@@ -102,7 +102,7 @@ public sealed class AssetAuditRunner
         var buildSettings = Path.Combine(request.Project, "ProjectSettings", "EditorBuildSettings.asset");
         if (!Directory.Exists(Path.Combine(request.Project, "Assets")) || !File.Exists(buildSettings))
         {
-            error = $"'{request.Project}' is not a Unity Project root " +
+            error = $"'{request.Project}' is not a Unity project root " +
                     "(expected Assets/ and ProjectSettings/EditorBuildSettings.asset)";
             return false;
         }
