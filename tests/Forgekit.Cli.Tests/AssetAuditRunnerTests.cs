@@ -143,4 +143,24 @@ public class AssetAuditRunnerTests
         Assert.DoesNotContain("DuplicateAsset", categories);
         Assert.Equal(2, categories.Count(c => c == "OrphanAsset"));
     }
+
+    [Fact]
+    public void Run_OutputExtensionDoesNotMatchFormat_ReturnsUsageError_AndLeavesTheFileAlone()
+    {
+        var file = Path.Combine(Path.GetTempPath(), "forgekit-tests-" + Guid.NewGuid().ToString("N") + ".png");
+        File.WriteAllText(file, "original");
+
+        try
+        {
+            var result = Run(Request(format: "json", output: file));
+
+            Assert.Equal(ExitCode.UsageError, result.Code);
+            Assert.Contains("does not match the json format", result.Stderr);
+            Assert.Equal("original", File.ReadAllText(file));
+        }
+        finally
+        {
+            File.Delete(file);
+        }
+    }
 }

@@ -123,6 +123,13 @@ public sealed class AssetAuditRunner
             return false;
         }
 
+        if (request.output is not null && !HasExtensionFor(format, request.output))
+        {
+            error = $"--output '{request.output}' does not match the {format.ToString().ToLowerInvariant()} format " +
+                    $"(expected {string.Join(" or ", ExtensionOf(format))}).";
+            return false;
+        }
+
         if (!TryParseSeverity(request.SeverityThreshold, "--severity-threshold", Severity.Info, out var threshold, out error))
             return false;
 
@@ -184,6 +191,16 @@ public sealed class AssetAuditRunner
 
         return true;
     }
+
+    private static string[] ExtensionOf(OutputFormat format) => format switch
+    {
+        OutputFormat.Json => new[] { ".json" },
+        OutputFormat.Markdown => new[] { ".md", ".markdown" },
+        _ => Array.Empty<string>()
+    };
+
+    private static bool HasExtensionFor(OutputFormat format, string path) =>
+        ExtensionOf(format).Contains(Path.GetExtension(path), StringComparer.OrdinalIgnoreCase);
 
     private static bool TryParseSeverity(
         string? text, string optionName, Severity fallback, out Severity severity, out string error)
