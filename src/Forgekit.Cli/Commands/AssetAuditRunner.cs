@@ -141,13 +141,10 @@ public sealed class AssetAuditRunner
             failOn = parsed;
         }
 
-        var defaults = new AuditOptions();
         var options = new AuditOptions
         {
             MaxTextureSize = request.MaxTextureSize,
-            ExcludePathFragments = defaults.ExcludePathFragments
-                .Concat(request.Excludes.Select(e => e.Replace('\\', '/')))
-                .ToList()
+            ExcludePathFragments = request.Excludes.Select(e => e.Replace('\\', '/')).ToList()
         };
 
         settings = new Settings(request.Project, request.output, format, options, threshold, failOn);

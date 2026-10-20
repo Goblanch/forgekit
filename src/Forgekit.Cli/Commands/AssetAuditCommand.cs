@@ -33,7 +33,7 @@ public static class AssetAuditCommand
 
         Option<string[]> exclude = new("--exclude")
         {
-            Description = "Path fragment excluded from orphan detection, e.g. Assets/ThirdParty/. Repeatable."
+            Description = "Path fragment of assets to ignore in all checks, e.g. Assets/ThirdParty/. Ignored assets still count as references. Repeatable."
         };
 
         Option<string?> threshold = new("--severity-threshold")

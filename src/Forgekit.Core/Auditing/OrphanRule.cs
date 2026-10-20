@@ -11,7 +11,7 @@ public sealed class OrphanRule : IAuditRule
             if (context.ReachableGuids.Contains(asset.Guid))
                 continue;
 
-            if (IsExcluded(asset.Path, context.Options))
+            if (context.Options.IsExcludedFromOrphanCheck(asset.Path))
                 continue;
 
             yield return new Finding(
@@ -22,8 +22,4 @@ public sealed class OrphanRule : IAuditRule
                 new Dictionary<string, string> { ["guid"] = asset.Guid.ToString("N") });
         }
     }
-
-    private static bool IsExcluded(string path, AuditOptions options) =>
-        options.ExcludePathFragments.Any(f =>
-            path.Contains(f, StringComparison.OrdinalIgnoreCase));
 }

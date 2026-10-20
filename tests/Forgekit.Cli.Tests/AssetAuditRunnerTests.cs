@@ -130,4 +130,17 @@ public class AssetAuditRunnerTests
         Assert.Equal(ExitCode.UsageError, result.Code);
         Assert.StartsWith("Error:", result.Stderr);
     }
+
+    [Fact]
+    public void Run_ExcludeFragment_AppliesToEveryRule()
+    {
+        var result = Run(Request(format: "json", excludes: new[] { "/Deprecated/" }));
+
+        using var doc = JsonDocument.Parse(result.Stdout);
+        var categories = doc.RootElement.GetProperty("findings").EnumerateArray()
+            .Select(f => f.GetProperty("category").GetString())
+            .ToList();
+        Assert.DoesNotContain("DuplicateAsset", categories);
+        Assert.Equal(2, categories.Count(c => c == "OrphanAsset"));
+    }
 }

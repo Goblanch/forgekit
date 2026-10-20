@@ -28,4 +28,34 @@ public class AssetAuditorTests
         Assert.Equal("Assets/Textures/hero_diffuse.png", finding.AssetPath);
         Assert.Equal(Severity.Warning, finding.Severity);
     }
+
+    [Fact]
+    public void Run_ExcludedFragment_IgnoresAssetsInEveryRule()
+    {
+        var options = new AuditOptions { ExcludePathFragments = new[] { "/Deprecated/" } };
+
+        var report = new AssetAuditor().Run(FixturePaths.Of(), options);
+
+        Assert.Equal(8, report.TotalAssetsScanned);
+        Assert.Equal(2, report.Findings.Count(f => f.Category == FindingCategory.OrphanAsset));
+        Assert.DoesNotContain(report.Findings, f => f.Category == FindingCategory.DuplicateAsset);
+        Assert.DoesNotContain(report.Findings, f => f.AssetPath.Contains("/Deprecated/"));
+    }
+
+    [Fact]
+    public void Run_ExcludedAssets_StillKeepTheirReferencesAlive()
+    {
+        var options = new AuditOptions { ExcludePathFragments = new[] { "/Prefabs/" } };
+
+        var report = new AssetAuditor().Run(FixturePaths.Of(), options);
+
+        // The material and hero texture are reachable only through the excluded prefabs:
+        // only the two icons remain orphans.
+        var orphans = report.Findings
+            .Where(f => f.Category == FindingCategory.OrphanAsset)
+            .Select(f => f.AssetPath)
+            .ToList();
+        Assert.Equal(2, orphans.Count);
+        Assert.All(orphans, p => Assert.Contains("icon_compressed", p));
+    }
 }
