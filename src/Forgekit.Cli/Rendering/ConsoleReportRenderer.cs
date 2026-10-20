@@ -1,6 +1,5 @@
 using Forgekit.Core.Domain;
 using Spectre.Console;
-using YamlDotNet.Core;
 
 namespace Forgekit.Cli.Rendering;
 
@@ -10,12 +9,19 @@ public sealed class ConsoleReportRenderer
 
     public ConsoleReportRenderer(IAnsiConsole console) => _console = console;
 
-    public void Render(AuditReport report)
+    /// <param name="report">The findings to list,</param>
+    /// <param name="unfiltered">The full report when <paramref name="report"/> was filtrered by severity. The summary
+    /// counts it, so hidden findings are never silently dropped.
+    /// </param>
+    public void Render(AuditReport report, AuditReport? unfiltered = null)
     {
+        var totals = unfiltered ?? report;
+        var hidden = totals.Findings.Count - report.Findings.Count;
+
         _console.MarkupLine($"[bold]forgekit assetaudit[/] — {Markup.Escape(report.ProjectPath)}");
         _console.WriteLine();
 
-        if (report.Findings.Count == 0)
+        if (totals.Findings.Count == 0)
         {
             _console.MarkupLine("[green]No findings.[/]");
             _console.WriteLine();
@@ -51,10 +57,13 @@ public sealed class ConsoleReportRenderer
         }
 
         _console.MarkupLine(
-            $"Summary: [{CountColor(report.CountOf(Severity.Error), "red")}]{report.CountOf(Severity.Error)} errors[/], " +
-            $"[{CountColor(report.CountOf(Severity.Warning), "yellow")}]{report.CountOf(Severity.Warning)} warnings[/], " +
-            $"[{CountColor(report.CountOf(Severity.Info), "aqua")}]{report.CountOf(Severity.Info)} info[/] — " +
-            $"{report.Findings.Count} findings across {report.TotalAssetsScanned} assets scanned.");
+            $"Summary: [{CountColor(totals.CountOf(Severity.Error), "red")}]{totals.CountOf(Severity.Error)} errors[/], " +
+            $"[{CountColor(totals.CountOf(Severity.Warning), "yellow")}]{totals.CountOf(Severity.Warning)} warnings[/], " +
+            $"[{CountColor(totals.CountOf(Severity.Info), "aqua")}]{totals.CountOf(Severity.Info)} info[/] — " +
+            $"{totals.Findings.Count} findings across {totals.TotalAssetsScanned} assets scanned.");
+
+        if (hidden > 0)
+            _console.MarkupLine($"[grey]{hidden} finding(s) hidden by --severity-threshold.[/]");
     }
 
     private static string ColorOf(Severity severity) => severity switch

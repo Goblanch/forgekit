@@ -163,4 +163,14 @@ public class AssetAuditRunnerTests
             File.Delete(file);
         }
     }
+
+    [Fact]
+    public void Run_SeverityThresholdError_ConsoleSummaryStillCountsEverything()
+    {
+        var result = Run(Request(threshold: "error"));
+
+        Assert.Contains("5 findings", result.Rendered);
+        Assert.Contains("hidden by --severity-threshold", result.Rendered);
+        Assert.DoesNotContain("[WARNING]", result.Rendered);
+    }
 }

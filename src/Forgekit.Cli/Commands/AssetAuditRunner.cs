@@ -40,7 +40,7 @@ public sealed class AssetAuditRunner
         try
         {
             var report = new AssetAuditor().Run(settings!.ProjectPath, settings.Options);
-            Emit(settings, report.WithMinimumSeverity(settings.Threshold));
+            Emit(settings, report.WithMinimumSeverity(settings.Threshold), report);
 
             var exceeded = settings.FailOn is { } failOn
                 && report.Findings.Any(f => f.Severity >= failOn);
@@ -54,11 +54,11 @@ public sealed class AssetAuditRunner
         }
     }
 
-    private void Emit(Settings settings, AuditReport report)
+    private void Emit(Settings settings, AuditReport report, AuditReport unfiltered)
     {
         if (settings.Format == OutputFormat.Console)
         {
-            new ConsoleReportRenderer(_console).Render(report);
+            new ConsoleReportRenderer(_console).Render(report, unfiltered);
             return;
         }
 
