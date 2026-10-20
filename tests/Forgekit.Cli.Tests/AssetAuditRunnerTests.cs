@@ -130,4 +130,64 @@ public class AssetAuditRunnerTests
         Assert.Equal(ExitCode.UsageError, result.Code);
         Assert.StartsWith("Error:", result.Stderr);
     }
+
+    [Fact]
+    public void Run_ExcludeFragment_AppliesToEveryRule()
+    {
+        var result = Run(Request(format: "json", excludes: new[] { "/Deprecated/" }));
+
+        using var doc = JsonDocument.Parse(result.Stdout);
+        var categories = doc.RootElement.GetProperty("findings").EnumerateArray()
+            .Select(f => f.GetProperty("category").GetString())
+            .ToList();
+        Assert.DoesNotContain("DuplicateAsset", categories);
+        Assert.Equal(2, categories.Count(c => c == "OrphanAsset"));
+    }
+
+    [Fact]
+    public void Run_OutputExtensionDoesNotMatchFormat_ReturnsUsageError_AndLeavesTheFileAlone()
+    {
+        var file = Path.Combine(Path.GetTempPath(), "forgekit-tests-" + Guid.NewGuid().ToString("N") + ".png");
+        File.WriteAllText(file, "original");
+
+        try
+        {
+            var result = Run(Request(format: "json", output: file));
+
+            Assert.Equal(ExitCode.UsageError, result.Code);
+            Assert.Contains("does not match the json format", result.Stderr);
+            Assert.Equal("original", File.ReadAllText(file));
+        }
+        finally
+        {
+            File.Delete(file);
+        }
+    }
+
+    [Fact]
+    public void Run_SeverityThresholdError_ConsoleSummaryStillCountsEverything()
+    {
+        var result = Run(Request(threshold: "error"));
+
+        Assert.Contains("5 findings", result.Rendered);
+        Assert.Contains("hidden by --severity-threshold", result.Rendered);
+        Assert.DoesNotContain("[WARNING]", result.Rendered);
+    }
+
+    [Fact]
+    public void Run_FailOnExceeded_ExplainsWhyOnStderr()
+    {
+        var result = Run(Request(failOn: "warning"));
+
+        Assert.Equal(ExitCode.FindingExceeded, result.Code);
+        Assert.Contains("4 finding(s) at or above 'warning' (--fail-on)", result.Stderr);
+    }
+
+    [Fact]
+    public void Run_FailOnNotExceeded_WritesNothingToStderr()
+    {
+        var result = Run(Request(failOn: "error"));
+
+        Assert.Equal(string.Empty, result.Stderr);
+    }
 }

@@ -74,4 +74,18 @@ public class ConsoleReportRendererTests
 
         Assert.Contains("Summary: 0 errors, 1 warnings, 0 info — 1 findings across 10 assets scanned.", output);
     }
+
+    [Fact]
+    public void Render_WithHiddenFindings_SummaryCountsEverything_AndMentionsHidden()
+    {
+        var full = ReportOf(Orphan("Assets/a.png"), Orphan("Assets/b.png"));
+        var console = new TestConsole();
+        console.Profile.Width = 200;
+
+        new ConsoleReportRenderer(console).Render(ReportOf(), full);
+
+        Assert.Contains("Summary: 0 errors, 2 warnings, 0 info — 2 findings across 10 assets scanned.", console.Output);
+        Assert.Contains("2 finding(s) hidden by --severity-threshold.", console.Output);
+        Assert.DoesNotContain("No findings.", console.Output);
+    }
 }

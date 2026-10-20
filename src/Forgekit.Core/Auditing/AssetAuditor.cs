@@ -24,7 +24,8 @@ public sealed class AssetAuditor
         var reachable = new ReferenceGraphBuilder().Build(assets, projectRoot).ReachableFrom(roots);
         var textures = new TextureImportReader().Read(assets, projectRoot);
 
-        var context = new AuditContext(assets, reachable, textures, options);
+        var audited = assets.Where(a => !options.IsExcluded(a.Path)).ToList();
+        var context = new AuditContext(audited, reachable, textures, options);
 
         var findings = _rules
             .SelectMany(rule => rule.Evaluate(context))

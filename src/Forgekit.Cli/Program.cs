@@ -1,6 +1,11 @@
 ﻿using System.CommandLine;
 using Forgekit.Cli;
 using Forgekit.Cli.Commands;
+using System.Globalization;
+
+// Force English
+CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
+CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
 
 var root = new RootCommand("forgekit - developer tools for game projects");
 root.Subcommands.Add(AssetAuditCommand.Create());

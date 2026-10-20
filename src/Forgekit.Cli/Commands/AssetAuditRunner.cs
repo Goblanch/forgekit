@@ -40,12 +40,20 @@ public sealed class AssetAuditRunner
         try
         {
             var report = new AssetAuditor().Run(settings!.ProjectPath, settings.Options);
-            Emit(settings, report.WithMinimumSeverity(settings.Threshold));
+            Emit(settings, report.WithMinimumSeverity(settings.Threshold), report);
 
-            var exceeded = settings.FailOn is { } failOn
-                && report.Findings.Any(f => f.Severity >= failOn);
+            if (settings.FailOn is { } failOn)
+            {
+                var exceeding = report.Findings.Count(f => f.Severity >= failOn);
+                if (exceeding > 0)
+                {
+                    _stderr.WriteLine(
+                        $"Failed: {exceeding} finding(s) at or above '{failOn.ToString().ToLowerInvariant()}' (--fail-on).");
+                    return ExitCode.FindingExceeded;
+                }
+            }
 
-            return exceeded ? ExitCode.FindingExceeded : ExitCode.Success;
+            return ExitCode.Success;
         }
         catch (Exception ex)
         {
@@ -54,11 +62,11 @@ public sealed class AssetAuditRunner
         }
     }
 
-    private void Emit(Settings settings, AuditReport report)
+    private void Emit(Settings settings, AuditReport report, AuditReport unfiltered)
     {
         if (settings.Format == OutputFormat.Console)
         {
-            new ConsoleReportRenderer(_console).Render(report);
+            new ConsoleReportRenderer(_console).Render(report, unfiltered);
             return;
         }
 
@@ -123,6 +131,13 @@ public sealed class AssetAuditRunner
             return false;
         }
 
+        if (request.output is not null && !HasExtensionFor(format, request.output))
+        {
+            error = $"--output '{request.output}' does not match the {format.ToString().ToLowerInvariant()} format " +
+                    $"(expected {string.Join(" or ", ExtensionOf(format))}).";
+            return false;
+        }
+
         if (!TryParseSeverity(request.SeverityThreshold, "--severity-threshold", Severity.Info, out var threshold, out error))
             return false;
 
@@ -141,13 +156,10 @@ public sealed class AssetAuditRunner
             failOn = parsed;
         }
 
-        var defaults = new AuditOptions();
         var options = new AuditOptions
         {
             MaxTextureSize = request.MaxTextureSize,
-            ExcludePathFragments = defaults.ExcludePathFragments
-                .Concat(request.Excludes.Select(e => e.Replace('\\', '/')))
-                .ToList()
+            ExcludePathFragments = request.Excludes.Select(e => e.Replace('\\', '/')).ToList()
         };
 
         settings = new Settings(request.Project, request.output, format, options, threshold, failOn);
@@ -187,6 +199,16 @@ public sealed class AssetAuditRunner
 
         return true;
     }
+
+    private static string[] ExtensionOf(OutputFormat format) => format switch
+    {
+        OutputFormat.Json => new[] { ".json" },
+        OutputFormat.Markdown => new[] { ".md", ".markdown" },
+        _ => Array.Empty<string>()
+    };
+
+    private static bool HasExtensionFor(OutputFormat format, string path) =>
+        ExtensionOf(format).Contains(Path.GetExtension(path), StringComparer.OrdinalIgnoreCase);
 
     private static bool TryParseSeverity(
         string? text, string optionName, Severity fallback, out Severity severity, out string error)
