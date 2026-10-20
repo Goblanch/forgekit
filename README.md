@@ -44,12 +44,12 @@ forgekit assetaudit --project <ruta-al-proyecto-unity>
 | Opción | Descripción | Por defecto |
 | --- | --- | --- |
 | `--project` | Raíz del proyecto Unity (contiene `Assets/` y `ProjectSettings/`). Obligatoria | — |
-| `--output` | Fichero donde escribir el informe | stdout |
+| `--output` | Fichero donde escribir el informe. Acepta: `json` `markdown` `md` | stdout |
 | `--format` | `console`, `json` o `markdown` | `console` |
 | `--max-texture-size` | Tamaño máximo de importación aceptado sin aviso | `2048` |
 | `--exclude` | Fragmento de ruta a excluir. Se puede repetir | `/Resources/`, `/Addressables/` |
 | `--severity-threshold` | Muestra solo hallazgos de esta severidad o superior | `info` |
-| `--fail-on` | Devuelve código 1 si hay hallazgos de esta severidad o superior | — |
+| `--fail-on` | Devuelve código 1 si hay hallazgos de esta severidad o superior. Acepta: `warning` `error` | — |
 
 ### Códigos de salida
 
