@@ -1,5 +1,8 @@
 # forgekit
 
+[![CI](https://github.com/Goblanch/forgekit/actions/workflows/ci.yml/badge.svg)](https://github.com/Goblanch/forgekit/actions/workflows/ci.yml)
+[![NuGet](https://img.shields.io/nuget/vpre/MiradorWorks.Forgekit)](https://www.nuget.org/packages/MiradorWorks.Forgekit)
+
 > [Read this in English](README.en.md) *(próximamente)*
 
 CLI de herramientas para desarrollo de videojuegos con Unity. Empieza con un auditor de assets (`forgekit assetaudit`), pensado desde el diseño para crecer con más subcomandos (el siguiente será un generador de changelogs desde Git).
@@ -17,6 +20,66 @@ Esto no es un problema técnico: cuantos más assets tiene un proyecto, más cue
 `forgekit assetaudit` resuelve esto: analiza el proyecto sin necesidad de abrir el Editor de Unity y genera un reporte de hallazgos.
 
 ---
+
+## Instalación
+
+Requiere el [SDK de .NET 10](https://dotnet.microsoft.com/download).
+
+```bash
+dotnet tool install --global MiradorWorks.Forgekit
+```
+
+Para actualizar: `dotnet tool update --global MiradorWorks.Forgekit`
+
+## Uso
+
+```bash
+forgekit assetaudit --project <ruta-al-proyecto-unity>
+```
+
+![Salida de forgekit assetaudit en consola](docs/images/assetaudit-console.png)
+
+### Opciones
+
+| Opción | Descripción | Por defecto |
+| --- | --- | --- |
+| `--project` | Raíz del proyecto Unity (contiene `Assets/` y `ProjectSettings/`). Obligatoria | — |
+| `--output` | Fichero donde escribir el informe. Acepta: `json` `markdown` `md` | stdout |
+| `--format` | `console`, `json` o `markdown` | `console` |
+| `--max-texture-size` | Tamaño máximo de importación aceptado sin aviso | `2048` |
+| `--exclude` | Fragmento de ruta a excluir. Se puede repetir | `/Resources/`, `/Addressables/` |
+| `--severity-threshold` | Muestra solo hallazgos de esta severidad o superior | `info` |
+| `--fail-on` | Devuelve código 1 si hay hallazgos de esta severidad o superior. Acepta: `warning` `error` | — |
+
+### Códigos de salida
+
+| Código | Significado |
+| --- | --- |
+| `0` | Sin hallazgos que alcancen `--fail-on` |
+| `1` | Hay hallazgos con severidad ≥ `--fail-on` |
+| `2` | Error de uso (argumentos o proyecto inválidos) |
+| `3` | Error en tiempo de ejecución |
+
+`--fail-on` se evalúa sobre el informe completo; `--severity-threshold` solo filtra lo que se muestra.
+
+### Uso en CI (proyecto Unity)
+
+```yaml
+- uses: actions/setup-dotnet@v4
+  with:
+    dotnet-version: 10.0.x
+- run: dotnet tool install --global MiradorWorks.Forgekit
+- run: forgekit assetaudit --project . --fail-on error
+```
+
+Si hay hallazgos de severidad `error` o superior, el job falla.
+
+## Limitaciones conocidas
+
+* Los assets cargados por string en runtime (`Resources.Load`) o vía Addressables no aparecen en el grafo de referencias serializadas. Por eso `Resources/` y `Addressables` se excluyen por defecto del chequeo de huérfanos. Detectarlos exigiría analizar código C#.
+* `--exclude` compara fragmentos de ruta, no patrones glob.
+* No detecta `.meta` huérfanos (sin asset asociado) ni assets sin `.meta`, típicos de merge mal resueltos.
+* Solo soporta Unity; los `.uasset` de Unreal no porque son binarios propietarios.
 
 ## Qué es lo que hay que resolver (y cómo)
 
@@ -63,17 +126,18 @@ Salida en tabla por consola, con exportación opcional a JSON o Markdown, y un n
 
 ## Roadmap
 
-* [ ] Parser de YAML a Unity -> grafo de referencias por GUID
-* [ ] Detección de assets huérfanos
-* [ ] Auditoría de configuración de importación de texturas
-* [ ] Detección de duplicados por hash de contenido
-* [ ] Reporte en consola + exportación a JSON/Markdown
-* [ ] Empaquetado como `dotnet tool`
-* [ ] Soporte de exclusión configurable (Addressables, Resources)
-* [ ] Segundo subcomando: `forgekit changelog` (generador de changelog desde Git)
+* [x] Parser de YAML de Unity y grafo de referencias por GUID
+* [x] Detección de huérfanos, texturas sin optimizar y duplicados
+* [x] Informe en consola, JSON y Markdown
+* [x] Empaquetado como `dotnet tool` y CI con GitHub Actions
+* [ ] Publicación en NuGet (`0.1.0`)
+* [ ] Chequeo de `.meta` huérfanos y assets sin `.meta`
+* [ ] Exclusiones con patrones glob
+* [ ] `--verbose`
+* [ ] Segundo subcomando: `forgekit changelog`
 
 ---
 
 ## Licencia
 
-*(pendiente de elegir)*
+MIT. Ver [LICENSE](LICENSE).
