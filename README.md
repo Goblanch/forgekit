@@ -26,10 +26,10 @@ Esto no es un problema técnico: cuantos más assets tiene un proyecto, más cue
 Requiere el [SDK de .NET 10](https://dotnet.microsoft.com/download).
 
 ```bash
-dotnet tool install --global MiradorWorks.Forgekit
+dotnet tool install --global MiradorWorks.Forgekit --prerelease
 ```
 
-Para actualizar: `dotnet tool update --global MiradorWorks.Forgekit`
+Para actualizar: `dotnet tool update --global MiradorWorks.Forgekit --prerelease`.
 
 ## Uso
 
@@ -68,7 +68,7 @@ forgekit assetaudit --project <ruta-al-proyecto-unity>
 - uses: actions/setup-dotnet@v4
   with:
     dotnet-version: 10.0.x
-- run: dotnet tool install --global MiradorWorks.Forgekit
+- run: dotnet tool install --global MiradorWorks.Forgekit --prerelease
 - run: forgekit assetaudit --project . --fail-on error
 ```
 
