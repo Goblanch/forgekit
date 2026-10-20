@@ -173,4 +173,21 @@ public class AssetAuditRunnerTests
         Assert.Contains("hidden by --severity-threshold", result.Rendered);
         Assert.DoesNotContain("[WARNING]", result.Rendered);
     }
+
+    [Fact]
+    public void Run_FailOnExceeded_ExplainsWhyOnStderr()
+    {
+        var result = Run(Request(failOn: "warning"));
+
+        Assert.Equal(ExitCode.FindingExceeded, result.Code);
+        Assert.Contains("4 finding(s) at or above 'warning' (--fail-on)", result.Stderr);
+    }
+
+    [Fact]
+    public void Run_FailOnNotExceeded_WritesNothingToStderr()
+    {
+        var result = Run(Request(failOn: "error"));
+
+        Assert.Equal(string.Empty, result.Stderr);
+    }
 }

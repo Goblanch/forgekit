@@ -42,10 +42,18 @@ public sealed class AssetAuditRunner
             var report = new AssetAuditor().Run(settings!.ProjectPath, settings.Options);
             Emit(settings, report.WithMinimumSeverity(settings.Threshold), report);
 
-            var exceeded = settings.FailOn is { } failOn
-                && report.Findings.Any(f => f.Severity >= failOn);
+            if (settings.FailOn is { } failOn)
+            {
+                var exceeding = report.Findings.Count(f => f.Severity >= failOn);
+                if (exceeding > 0)
+                {
+                    _stderr.WriteLine(
+                        $"Failed: {exceeding} finding(s) at or above '{failOn.ToString().ToLowerInvariant()}' (--fail-on).");
+                    return ExitCode.FindingExceeded;
+                }
+            }
 
-            return exceeded ? ExitCode.FindingExceeded : ExitCode.Success;
+            return ExitCode.Success;
         }
         catch (Exception ex)
         {
