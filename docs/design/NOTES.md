@@ -93,3 +93,21 @@ Formato por entrada: fecha, decisión, alternativas consideradas, por qué se de
 - El texto de la consola está en inglés; el ejemplo del SPEC §6.1 estaba en español y debe actualizarse.
 - `--format json|markdown` sin `--output` escribe a stdout; `--format console` con `--output` es un error de uso.
 - El proyecto se empaqueta como `dotnet tool` (`PackAsTool`, comando `forgekit`).
+
+---
+
+## 2026-10-20 — `--exclude` aplica a todas las reglas
+
+**Decisión**: `--exclude` ignora los assets que coinciden en todas las reglas (huérfanos, texturas, duplicados). `/Resources/` y `/Addressables/` siguen siendo exclusiones internas, solo del chequeo de huérfanos. Los assets excluidos siguen formando parte del grafo de referencias.
+
+**Alternativas consideradas**: dejar `--exclude` solo para huérfanos (descartada: la prueba manual mostró que se espera que ignore la carpeta entera, por ejemplo ThirdParty); filtrar antes de construir el grafo (descartada: un prefab excluido dejaría de mantener vivas sus texturas y saldrían falsos huérfanos).
+
+**Por qué**: es lo que el usuario espera de una exclusión, y filtrar solo en el contexto de las reglas la hace correcta sin tocar el grafo.
+
+## 2026-10-20 — Salida: `--output` validada y resumen sin filtrar
+
+**Decisión**: `--output` exige una extensión que encaje con el formato (`.json`, `.md`/`.markdown`) y falla con código 2 antes de escribir. El resumen de consola cuenta todos los hallazgos e indica cuántos oculta `--severity-threshold`. Cuando `--fail-on` falla, se escribe el motivo en stderr.
+
+**Alternativas consideradas**: pedir `--force` para sobrescribir (descartada: en CI sobrescribir el informe anterior es lo normal).
+
+**Por qué**: la prueba manual sobrescribió un PNG con JSON sin avisar, y un resumen con "0 findings" junto a un exit code 1 era engañoso.
