@@ -33,7 +33,7 @@ public static class AssetAuditCommand
 
         Option<string[]> exclude = new("--exclude")
         {
-            Description = "Path fragment excluded from orphan detection, e.g. Assets/ThirdParty/. Repeatrable."
+            Description = "Path fragment excluded from orphan detection, e.g. Assets/ThirdParty/. Repeatable."
         };
 
         Option<string?> threshold = new("--severity-threshold")
@@ -43,7 +43,7 @@ public static class AssetAuditCommand
 
         Option<string?> failOn = new("--fail-on")
         {
-            Description = "Exit with code 1 if any findings is at or above this level: warning or error."
+            Description = "Exit with code 1 if any finding is at or above this level: warning or error."
         };
 
         Command command = new(
