@@ -15,12 +15,18 @@ public sealed class ReferenceGraphBuilder
         foreach (var asset in assets)
         {
             var absolutePath = Path.Combine(projectRoot, asset.Path);
-            if (!AssetScanner.IsYamlParsable(absolutePath))
-                continue;
 
-            foreach (var referencedGuid in _parser.ExtractReferencedGuids(absolutePath))
+            if (AssetScanner.IsYamlParsable(absolutePath))
             {
-                graph.AddEdge(asset.Guid, referencedGuid);
+                foreach (var referencedGuid in _parser.ExtractReferencedGuids(absolutePath))
+                    graph.AddEdge(asset.Guid, referencedGuid);
+            }
+
+            // .meta files also hold references (FBX materials, asmdef, default references)
+            foreach (var referencedGuid in _parser.ExtractReferencedGuids(absolutePath + ".meta"))
+            {
+                if (referencedGuid != asset.Guid)
+                    graph.AddEdge(asset.Guid, referencedGuid);
             }
         }
 

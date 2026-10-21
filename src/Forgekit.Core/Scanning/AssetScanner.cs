@@ -8,7 +8,8 @@ public sealed class AssetScanner
 {
     private static readonly HashSet<string> YamlPareseableExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
-        ".unity", ".prefab", ".asset", ".mat", ".controller"
+        ".unity", ".prefab", ".asset", ".mat", ".controller",
+        ".anim", ".overrideController", ".playable", ".spriteatlas"
     };
 
     private readonly UnityYamlParser _parser = new();
