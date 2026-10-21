@@ -67,4 +67,16 @@ public class AuditRulesTests
         var finding = Assert.Single(findings);
         Assert.Equal("Assets/a.png", finding.AssetPath);
     }
+
+    [Theory]
+    [InlineData("Assets/Code/Player.cs")]
+    [InlineData("Assets/Code/Game.asmdef")]
+    [InlineData("Assets/Shaders/Foo.shader")]
+    [InlineData("Assets/Shaders/Foo.SHADERGRAPH")]
+    public void OrphanRule_DoesNotJudgeCodeAndShaders(string path)
+    {
+        var asset = new AssetRecord(Guid.NewGuid(), path, AssetType.Other, 10, "H");
+
+        Assert.Empty(new OrphanRule().Evaluate(ContextOf(new[] { asset })));
+    }
 }

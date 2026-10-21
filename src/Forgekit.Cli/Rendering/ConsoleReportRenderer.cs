@@ -48,7 +48,7 @@ public sealed class ConsoleReportRenderer
             {
                 var paths = string.Join(" == ", PathsOf(finding).Select(Markup.Escape));
                 var suffix = sharedMessage is null
-                    ? $"[grey]— {Markup.Escape(finding.Message)}[/]"
+                    ? $"[grey] — {Markup.Escape(finding.Message)}[/]"
                     : string.Empty;
                 _console.MarkupLine($"    {paths}{suffix}");
             }

@@ -11,7 +11,8 @@ public sealed class OrphanRule : IAuditRule
             if (context.ReachableGuids.Contains(asset.Guid))
                 continue;
 
-            if (context.Options.IsExcludedFromOrphanCheck(asset.Path))
+            if (context.Options.IsExcludedFromOrphanCheck(asset.Path)
+                || context.Options.IsSkippedFromOrphanCheck(asset.Path))
                 continue;
 
             yield return new Finding(

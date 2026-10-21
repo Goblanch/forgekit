@@ -20,7 +20,13 @@ public sealed class AssetAuditor
         options ??= new AuditOptions();
 
         var assets = new AssetScanner().ScanAssets(projectRoot);
-        var roots = new BuildSettingsReader().ReadEnabledSceneGuids(projectRoot);
+
+        var roots = new HashSet<Guid>(new BuildSettingsReader().ReadEnabledSceneGuids(projectRoot));
+        roots.UnionWith(new ProjectSettingsReader().ReadReferencedGuids(projectRoot));
+        roots.UnionWith(assets
+            .Where(a => options.IsExcludedFromOrphanCheck(a.Path))
+            .Select(a => a.Guid));
+
         var reachable = new ReferenceGraphBuilder().Build(assets, projectRoot).ReachableFrom(roots);
         var textures = new TextureImportReader().Read(assets, projectRoot);
 
