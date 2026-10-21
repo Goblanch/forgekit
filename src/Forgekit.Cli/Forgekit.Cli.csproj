@@ -21,7 +21,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>forgekit</ToolCommandName>
     <PackageId>MiradorWorks.Forgekit</PackageId>
-    <Version>0.1.0-rc.1</Version>
+    <Version>0.1.0-rc.2</Version>
     
     <Authors>Gonzalo Blanch Domínguez (MiradorWorks)</Authors>
     <Description>CLI toolkit for game development. Audits Unity projects for orphan assets, unoptimized textures and duplicate files, and can fail a CI pipeline.</Description>
