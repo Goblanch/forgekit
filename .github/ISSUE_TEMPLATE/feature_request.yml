@@ -1,0 +1,40 @@
+name: Feature request
+description: Suggest an idea or an improvement
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem do you want to solve?
+      description: Describe the situation in your project, not only the solution you have in mind.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What should forgekit do? An example command or output helps a lot.
+      placeholder: forgekit assetaudit --project . --some-new-option
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+      description: Including workarounds you use today (for example with --exclude).
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - New audit rule
+        - assetaudit options or output
+        - CI integration
+        - Other game engines (Godot, Unreal...)
+        - Documentation
+        - Other
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I would be willing to open a pull request for this
