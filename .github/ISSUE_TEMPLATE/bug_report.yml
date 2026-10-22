@@ -1,0 +1,88 @@
+name: Bug report
+description: Something doesn't work as expected (crash, wrong result, false positive)
+title: "bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this. Issues in English or Spanish are both welcome.
+        Please don't paste anything confidential from your project (asset names are fine to anonymize).
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of problem is it?
+      options:
+        - Crash or error message
+        - False positive (an asset is reported but it is actually used)
+        - False negative (a problem is not reported)
+        - Wrong exit code
+        - Wrong or broken report output (console / JSON / Markdown)
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command you ran
+      description: The exact command, including options.
+      placeholder: forgekit assetaudit --project . --fail-on warning --exclude "/Plugins/"
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Paste the output or error message.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: false-positive
+    attributes:
+      label: How is the asset used? (false positives only)
+      description: |
+        If forgekit reported an asset as orphan but it is used, tell us how: referenced from a scene/prefab,
+        loaded with Resources.Load or Addressables, loaded by string/path, etc. This is the most useful information for us.
+  - type: input
+    id: version
+    attributes:
+      label: forgekit version
+      description: Output of `forgekit --version`
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: input
+    id: unity
+    attributes:
+      label: Unity version
+      description: See ProjectSettings/ProjectVersion.txt
+      placeholder: 6000.0.41f1
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Windows
+        - Linux
+        - macOS
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: dotnet
+    attributes:
+      label: .NET SDK version
+      description: Output of `dotnet --version`
+  - type: textarea
+    id: context
+    attributes:
+      label: Project size and context
+      description: Approximate number of assets, whether it runs in CI, whether .meta files are committed, etc.
